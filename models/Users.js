@@ -1,63 +1,65 @@
-const S = require("sequelize");
+const { Model, DataTypes } = require("sequelize");
 const db = require("../db");
-//const bc = require("bcrypt");
+const bcrypt = require("bcrypt");
 
-class User extends S.Model {
-/*   hash(password, salt) {
-    return bc.hash(password, salt); */
-/*   }
+class Users extends Model {
+  hash(password, salt) {
+    return bcrypt.hash(password, salt);
+  }
+
   validatePassword(password) {
-    return this.hash(password, this.salt).then(
-      (newHash) => newHash === this.password
-    );
-  } */
+   return this.hash(password,this.salt)
+   .then(newHash =>newHash===this.password)
+  }
 }
 
-User.init(
-  { is_admin: {
-    type: S.BOOLEAN,
-    defaultValue: false,
-  },
-    name: {  type: S.STRING,
-      allowNull: false,},
-    lastname: { type: S.STRING,
-      allowNull: false,},
+Users.init(
+  {
+    is_admin: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    },
+    name: { type: DataTypes.STRING, allowNull: false },
+    lastname: { type: DataTypes.STRING, allowNull: false },
     email: {
-      type: S.STRING,
+      type: DataTypes.STRING,
       allowNull: false,
       unique: true,
       validate: {
         isEmail: true,
-      }},
+      },
+    },
     password: {
-      type: S.STRING,
+      type: DataTypes.STRING,
       allowNull: false,
     },
-    image: { type: S.STRING },
+    salt: {
+      type: DataTypes.STRING,
+    },
+    image: { type: DataTypes.STRING },
 
-    phone: { type: S.BIGINT,isNumeric: true,   allowNull: false, },
-   
-    salt: { type: S.STRING },
+    phone: { type: DataTypes.BIGINT, isNumeric: true, allowNull: false },
   },
   { sequelize: db, modelName: "user" }
 );
 
-/* User.beforeCreate((user) => {
-  const salt = bc.genSaltSync();
+Users.beforeCreate((user) => {
+  const salt = bcrypt.genSaltSync(8);
   user.salt = salt;
 
-  if (user.email) {
-    user.email = user.email.toLowerCase();
-  }
-
-  return user
-    .hash(user.password, salt)
-    .then((result) => {
-      user.password = result;
-    })
-    .catch((err) => {
-      console.log(err);
-    });
+  return user.hash(user.password, salt).then((hash) => {
+    user.password = hash;
+  });
 });
+
+/* Users.prototype.hash = function (plainPassword, salt) {
+  return bcrypt.hash(plainPassword, salt);
+};
+
+Users.prototype.validatePassword = function (password) {
+  return bcrypt
+    .hash(password, this.salt)
+    .then((hash) => hash === this.password);
+};
  */
-module.exports = User;
+module.exports = Users;
