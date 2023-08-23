@@ -1,7 +1,7 @@
 const express = require('express')
 const app = express()
 const routes= require ("./routes") ;
-const db = require("./db") ;
+const db = require ("./db") ;
 const cookiesParser = require("cookie-parser");
 const cors = require('cors');
 

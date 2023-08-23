@@ -7,7 +7,7 @@ Visits.init(
   {
     date: { type: DataTypes.DATEONLY,  allowNull: false},
     hour: { type: DataTypes.TIME,  allowNull: false},
-    iDataTypes_booked: {
+    is_booked: {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
     },

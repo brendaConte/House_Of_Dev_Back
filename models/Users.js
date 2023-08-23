@@ -12,6 +12,7 @@ class Users extends Model {
   }
 }
 
+
 Users.init(
   {
     is_admin: {

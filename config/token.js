@@ -3,7 +3,7 @@ const SECRET= "property";
 
 const generateToken= (payload) => {
   const token = jwt.sign( {user:payload }, SECRET, {
-    expiresIn: "2d"
+    expiresIn: "30d"
   });
   return token;
 }
