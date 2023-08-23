@@ -1,7 +1,15 @@
+const jwt = require("jsonwebtoken") ;
+const SECRET= "property";
 
+const generateToken= (payload) => {
+  const token = jwt.sign( {user:payload }, SECRET, {
+    expiresIn: "30d"
+  });
+  return token;
+}
 
-const generateToken= () => {}
+const validateToken= (token) => {
+  return jwt.verify(token, SECRET)
+}
 
-const validateToken= () => {}
-
-module.exorts= {generateToken, validateToken}
+module.exports= {generateToken, validateToken} 
