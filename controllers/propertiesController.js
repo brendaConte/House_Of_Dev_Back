@@ -2,26 +2,32 @@ const Property = require("../models/Property");
 const Category = require("../models/Category");
 const Sequelize = require("sequelize");
 
-
 exports.all_properties = (req, res) => {
-  Property.findAll().then((properties) => {
+  Property.findAll({
+    order: [["updatedAt", "DESC"]],
+    include: {
+      model: Category, // Modelo relacionado que deseas incluir
+      as: "category", // Alias de la relación, asegúrate de que coincida con el alias en tu modelo Property
+    },
+  }).then((properties) => {
     res.send(properties);
   });
 };
 
 exports.add_property = async (req, res, next) => {
   const propertyData = req.body;
-  console.log("que ondaaa", propertyData)
+
   try {
     const newProperty = await Property.create(propertyData);
-console.log("newProperty",newProperty)
+    console.log("newProperty", req.body.categoria);
+
     const findCategory = await Category.findOne({
-      where: { name: req.body.name },
+      where: { name: req.body.categoria },
     });
     console.log("Find category", findCategory);
 
     if (!findCategory) {
-      const newCategory = await Category.create({ name: req.body.name });
+      const newCategory = await Category.create({ name: req.body.categoria });
       newProperty.categoryId = newCategory.id;
       newProperty.save();
       return res.status(201).send(newProperty);
@@ -58,8 +64,9 @@ exports.delete_property = (req, res) => {
 };
 
 exports.edit_property = (req, res) => {
+  console.log("req.body edit", req.body);
   Property.update(req.body, {
-    where: { id: req.params.id },
+    where: { id: req.body.id },
     returning: true,
   }).then(([affectedRows, property_edit]) => {
     console.log("property edit", property_edit);
@@ -76,6 +83,7 @@ exports.search_locality = async (req, res) => {
         locality: { [Sequelize.Op.like]: `%${locality}%` },
         state: { [Sequelize.Op.like]: `%${state}%` },
       },
+      include: { model: Category, as: "category" },
     });
     if (!oneProperty)
       return res.send("no se encontraron propiedades en esta localidad");
@@ -100,11 +108,13 @@ exports.search_state = async (req, res) => {
 };
 
 exports.search_category = async (req, res) => {
-  const { categorysearch } = req.params;
+  const { categorysearch, state } = req.params;
+  console.log("resqparams", req.params);
   try {
     const property = await Property.findAll({
       where: {
         "$category.name$": categorysearch,
+        state: { [Sequelize.Op.like]: `%${state}%` },
       },
       include: { model: Category, as: "category" },
     });
