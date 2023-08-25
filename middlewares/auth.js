@@ -1,15 +1,16 @@
 const { validateToken } = require("../config/token");
 
-function validateUser (req,res,next) {
-const token = req.cookies.token ;
-if(!token) return res.sendStatus(401) ;
+function validateUser(req, res, next) {
+  const token = req.cookies.token;
+  console.log("token", token);
+  if (!token) return res.sendStatus(401);
 
-const {user} = validateToken(token) ;
-if(!user) return res.sendStatus(401)
+  const { user } = validateToken(token);
+  if (!user) return res.sendStatus(401);
 
-req.user = user ;
+  req.user = user;
 
-next();
+  next();
 }
 
 const isAdmin = (req, res, next) => {
@@ -17,8 +18,8 @@ const isAdmin = (req, res, next) => {
   if (req.user.is_admin) {
     next();
   } else {
-    res.status(403).send("Acceso denegado"); 
+    res.status(403).send("Acceso denegado");
   }
 };
 
-module.exports= {validateUser, isAdmin}
+module.exports = { validateUser, isAdmin };
