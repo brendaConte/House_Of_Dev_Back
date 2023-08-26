@@ -40,7 +40,7 @@ exports.add_favorite = async (req, res) => {
     console.log("Favorite=>", favorite);
 
     if (favorite) {
-      return res.status(200).send("El favorito ya existe");
+      return res.status(404).send("El favorito ya existe");
     }
 
     const newFavorite = await Favorites.create({
@@ -56,16 +56,19 @@ exports.add_favorite = async (req, res) => {
 };
 exports.delete_favorite = async (req, res) => {
   try {
-    console.log("delete",req.params);
-    const favorite = req.params.id;
-    console.log("FAVORITES DELETE", favorite);
-
+    const { userId, propertyId } = req.params;
+    console.log("deleted", req.params);
     const deleteFavorite = await Favorites.destroy({
-      where: { id: favorite },
+      where: {
+        userId,
+        propertyId,
+      },
     });
+    if (!deleteFavorite) return res.send("no hay favoritos");
 
     res.status(202).send("favorito eliminado");
   } catch (error) {
+    console.log("error", error);
     error.message;
   }
 };
